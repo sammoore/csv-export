@@ -1,0 +1,28 @@
+{
+  "name": "csv-export",
+  "version": "0.1.0",
+  "description": "Transform CSV into JSON, adapting values to reasonable types.",
+  "bin": {
+    "csv-export": "./app.js"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "start": "node app",
+    "test": "mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/samtheprogram/csv-export.git"
+  },
+  "author": "Sam Moore <semoore95@gmail.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/samtheprogram/csv-export/issues"
+  },
+  "homepage": "https://github.com/samtheprogram/csv-export#readme",
+  "devDependencies": {
+    "mocha": "~4.0.1"
+  }
+}
