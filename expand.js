@@ -3,7 +3,7 @@
 const transform = require('stream-transform');
 const qs = require('qs');
 
-const OPTIONS = { encode: false };
+const OPTIONS = { encode: true };
 
 module.exports = transform((data, cb) => {
   let result = null;
