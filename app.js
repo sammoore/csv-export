@@ -21,6 +21,7 @@ const expand = require('./expand');
 
 const args = parseArgs();
 const input = getInputStream(args);
+const parseGeoCode = require('./parseGeoCode');
 
 const adapter = transform((data, cb) => {
   data.hours = data.hours.map(parseHumanTimeRange);
@@ -34,8 +35,10 @@ const adapter = transform((data, cb) => {
       data.perks[key] = false;
     }
   }
-
-  cb(null, data);
+  parseGeoCode(data.address).then(response => {
+    data.coordinates = response;
+    cb(null, data);
+  });
 });
 
 const jsonify = transform((data, cb) => {
