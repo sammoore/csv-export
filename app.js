@@ -57,15 +57,19 @@ const toStringStream = transform((data, cb) => {
 input
 .pipe(csv.parse({ trim: true }))
 .pipe(translateHeadings)
+//.pipe(logger({ prefix: 'translated', n: 2 }))
 .pipe(csv.stringify())
+//.pipe(logger({ prefix: 'stringified', n: 2 }))
 .pipe(csv.parse({ columns: true }))
+//.pipe(logger({ prefix: 'parsed', n: 2 }))
 //.pipe(skip(1)) // ignore unnecessary { column: 'column', ... } object
 .pipe(expand) // expand 'foo[bar]' and 'arr[0]' keys in each object
 .pipe(adapter) // adapt values to mongo compatible
+.pipe(logger({ prefix: 'adapted', n: 2 }))
 .pipe(jsonify) // get a JSON string for each row
 .pipe(collect) // collect each element to an JSON Array string, as a buffer.
 .pipe(toStringStream) // turn buffer to a string
-.pipe(process.stdout);
+//.pipe(process.stdout);
 
 function getInputStream(args) {
   if (args['-']) {
