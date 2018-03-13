@@ -5,7 +5,7 @@ var options = {
   
   // Optional depending on the providers
   httpAdapter: 'https', // Default
-  apiKey: 'AIzaSyCWrjeCP-0tXANzMDfbhMswlSv46WmjXRE', // for Mapquest, OpenCage, Google Premier
+  apiKey: 'AIzaSyAazZjefmevaOY90VrFyrhEUKWDkYRdWbw', // for Mapquest, OpenCage, Google Premier
   formatter: null         // 'gpx', 'string', ...
 };
 
@@ -13,7 +13,6 @@ var geocoder = NodeGeocoder(options);
 // Using callback
 
 module.exports = function parseGeoCode(address) {
-
   return geocoder.geocode(address)
   .then(function(res) {
     return [res[0]['longitude'], res[0]['latitude']];

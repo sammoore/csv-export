@@ -22,10 +22,11 @@ const expand = require('./expand');
 const args = parseArgs();
 const input = getInputStream(args);
 const parseGeoCode = require('./parseGeoCode');
+const ratings = ['Better than nothing', 'Good', 'Excellent'];
 
 const adapter = transform((data, cb) => {
   data.hours = data.hours.map(parseHumanTimeRange);
-  
+
   for (var key in data.perks) {
     var value = data.perks[key];
 
@@ -35,6 +36,13 @@ const adapter = transform((data, cb) => {
       data.perks[key] = false;
     }
   }
+  if (data.access.toLowerCase().indexOf('open;customers only') != -1){
+    data.access = 'Open'
+  }
+  if (data.access.toLowerCase().indexOf('token') != -1){
+    data.access = 'Key'
+  }
+  data.rating = getRating(data.rating);
   parseGeoCode(data.address).then(response => {
     data.coordinates = response;
     cb(null, data);
@@ -68,11 +76,11 @@ input
 //.pipe(skip(1)) // ignore unnecessary { column: 'column', ... } object
 .pipe(expand) // expand 'foo[bar]' and 'arr[0]' keys in each object
 .pipe(adapter) // adapt values to mongo compatible
-.pipe(logger({ prefix: 'adapted', n: 2 }))
+// .pipe(logger({ prefix: 'adapted', n: 2 }))
 .pipe(jsonify) // get a JSON string for each row
 .pipe(collect) // collect each element to an JSON Array string, as a buffer.
 .pipe(toStringStream) // turn buffer to a string
-//.pipe(process.stdout);
+.pipe(process.stdout);
 
 function getInputStream(args) {
   if (args['-']) {
@@ -80,4 +88,8 @@ function getInputStream(args) {
   } else {
     return fs.createReadStream(args.file);
   } 
+}
+
+function getRating(rating){
+  return ratings.indexOf(rating);
 }

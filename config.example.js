@@ -11,12 +11,12 @@ module.exports = {
     "Access": "access",
     "Accesibility": "perks[handicapAccessable]",
     "Parking": "perks[parking]",
-    "Monday": "monday",
-    "Tuesday": "tuesday",
-    "Wednesday": "wednesday",
-    "Thursday": "thursday",
-    "Friday": "friday",
-    "Saturday": "saturday",
-    "Sunday": "sunday"
+    "Monday": "hours[1]",
+    "Tuesday": "hours[2]",
+    "Wednesday": "hours[3]",
+    "Thursday": "hours[4]",
+    "Friday": "hours[5]",
+    "Saturday": "hours[6]",
+    "Sunday": "hours[0]"
   }
 };
