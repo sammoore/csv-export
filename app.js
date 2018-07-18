@@ -23,7 +23,9 @@ const parseGeoCode = require('./parseGeoCode');
 const ratings = ['Better than nothing', 'Good', 'Excellent'];
 
 const adapter = transform((data, cb) => {
-  data.hours = data.hours.map(parseHumanTimeRange);
+  data.hours = data.hours.map((value, idx) => {
+    return parseHumanTimeRange(value);
+  });
 
   for (var key in data.perks) {
     var value = data.perks[key];
