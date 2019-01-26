@@ -11,7 +11,7 @@ const fs = require('fs');
 const parseArgs = require('./parse-args');
 const parseHumanTimeRange = require('./parseHumanTimeRange');
 const transform = require('stream-transform');
-const Collector = require('./collect');
+const collector = require('./lib/collector');
 const logger = require('./logger');
 const config = require('./config.example.js');
 const translateHeadings = require('./pre-transformer.js')(config);
@@ -54,7 +54,7 @@ const jsonify = transform((data, cb) => {
   catch (err) { cb(err); }
 });
 
-const collect = new Collector({
+const collect = collector({
   delimiter: ',',
   prefix: '[',
   suffix: ']'
