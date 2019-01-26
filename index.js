@@ -1,11 +1,6 @@
 'use strict';
 
-const { create, keys } = Object;
-
 const csv = require('csv');
-const fs = require('fs');
-const parseArgs = require('./parse-args');
-
 const transform = require('stream-transform');
 const collector = require('./lib/collector');
 const expand = require('./lib/expand');
@@ -84,18 +79,3 @@ function csvStreamToAdaptedJsonStream(csvStream/*: NodeJS.ReadStream | ReadStrea
   ;
 };
 Object.assign(module.exports, { csvStreamToAdaptedJsonStream });
-
-if (require.main === module) {
-  const args = parseArgs();
-  const input = getInputStream(args);
-
-  csvStreamToAdaptedJsonStream(input).pipe(process.stdout);
-}
-
-function getInputStream(args) {
-  if (args['-']) {
-    return process.stdin;
-  } else {
-    return fs.createReadStream(args.file);
-  } 
-}
