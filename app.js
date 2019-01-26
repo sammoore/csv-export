@@ -12,12 +12,12 @@ const parseArgs = require('./parse-args');
 const parseHumanTimeRange = require('./parseHumanTimeRange');
 const transform = require('stream-transform');
 const collector = require('./lib/collector');
-const logger = require('./logger');
+const expand = require('./lib/expand');
+const skip = require('./lib/skip');
+const logger = require('./lib/logger');
+
 const config = require('./config.example.js');
 const translateHeadings = require('./pre-transformer.js')(config);
-
-const skip = require('./skip');
-const expand = require('./expand');
 
 const parseGeoCode = require('./parseGeoCode');
 const ratings = ['Better than nothing', 'Good', 'Excellent'];
