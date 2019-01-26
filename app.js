@@ -19,8 +19,6 @@ const translateHeadings = require('./pre-transformer.js')(config);
 const skip = require('./skip');
 const expand = require('./expand');
 
-const args = parseArgs();
-const input = getInputStream(args);
 const parseGeoCode = require('./parseGeoCode');
 const ratings = ['Better than nothing', 'Good', 'Excellent'];
 
@@ -65,22 +63,36 @@ const toStringStream = transform((data, cb) => {
   catch (err) { cb(err); }
 });
 
-input
-.pipe(csv.parse({ trim: true }))
-.pipe(translateHeadings)
-//.pipe(logger({ prefix: 'translated', n: 2 }))
-.pipe(csv.stringify())
-//.pipe(logger({ prefix: 'stringified', n: 2 }))
-.pipe(csv.parse({ columns: true }))
-//.pipe(logger({ prefix: 'parsed', n: 2 }))
-//.pipe(skip(1)) // ignore unnecessary { column: 'column', ... } object
-.pipe(expand) // expand 'foo[bar]' and 'arr[0]' keys in each object
-.pipe(adapter) // adapt values to mongo compatible
-// .pipe(logger({ prefix: 'adapted', n: 2 }))
-.pipe(jsonify) // get a JSON string for each row
-.pipe(collect) // collect each element to an JSON Array string, as a buffer.
-.pipe(toStringStream) // turn buffer to a string
-.pipe(process.stdout);
+function getRating(rating){
+  return ratings.indexOf(rating);
+}
+
+function csvStreamToAdaptedJsonStream(csvStream/*: NodeJS.ReadStream | ReadStream */)/*: NodeJS.ReadStream | ReadStream */ {
+  return csvStream
+    .pipe(csv.parse({ trim: true }))
+    .pipe(translateHeadings)
+    //.pipe(logger({ prefix: 'translated', n: 2 }))
+    .pipe(csv.stringify())
+    //.pipe(logger({ prefix: 'stringified', n: 2 }))
+    .pipe(csv.parse({ columns: true }))
+    //.pipe(logger({ prefix: 'parsed', n: 2 }))
+    //.pipe(skip(1)) // ignore unnecessary { column: 'column', ... } object
+    .pipe(expand) // expand 'foo[bar]' and 'arr[0]' keys in each object
+    .pipe(adapter) // adapt values to mongo compatible
+    // .pipe(logger({ prefix: 'adapted', n: 2 }))
+    .pipe(jsonify) // get a JSON string for each row
+    .pipe(collect) // collect each element to an JSON Array string, as a buffer.
+    .pipe(toStringStream) // turn buffer to a string
+  ;
+};
+Object.assign(module.exports, { csvStreamToAdaptedJsonStream });
+
+if (require.main === module) {
+  const args = parseArgs();
+  const input = getInputStream(args);
+
+  csvStreamToAdaptedJsonStream(input).pipe(process.stdout);
+}
 
 function getInputStream(args) {
   if (args['-']) {
@@ -88,8 +100,4 @@ function getInputStream(args) {
   } else {
     return fs.createReadStream(args.file);
   } 
-}
-
-function getRating(rating){
-  return ratings.indexOf(rating);
 }
