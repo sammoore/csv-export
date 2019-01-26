@@ -2,14 +2,10 @@
 
 const { create, keys } = Object;
 
-function values(object) {
-  return keys(object).map(k => object[k]);
-}
-
 const csv = require('csv');
 const fs = require('fs');
 const parseArgs = require('./parse-args');
-const parseHumanTimeRange = require('./parseHumanTimeRange');
+
 const transform = require('stream-transform');
 const collector = require('./lib/collector');
 const expand = require('./lib/expand');
@@ -18,7 +14,7 @@ const logger = require('./lib/logger');
 
 const config = require('./config.example.js');
 const translateHeadings = require('./pre-transformer.js')(config);
-
+const parseHumanTimeRange = require('./parseHumanTimeRange');
 const parseGeoCode = require('./parseGeoCode');
 const ratings = ['Better than nothing', 'Good', 'Excellent'];
 
