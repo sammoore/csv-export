@@ -2,9 +2,7 @@
   "name": "csv-export",
   "version": "0.1.0",
   "description": "Transform CSV into JSON, adapting values to reasonable types.",
-  "bin": {
-    "csv-export": "./app.js"
-  },
+  "main": "index.js",
   "directories": {
     "test": "test"
   },

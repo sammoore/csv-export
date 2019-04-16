@@ -8,12 +8,12 @@ const skip = require('./lib/skip');
 const logger = require('./lib/logger');
 
 const config = require('./config.example.js');
-const translateHeadings = require('./pre-transformer.js')(config);
+const mkTranslateHeadings = require('./pre-transformer.js');
 const parseHumanTimeRange = require('./parseHumanTimeRange');
 const parseGeoCode = require('./parseGeoCode');
 const ratings = ['Better than nothing', 'Good', 'Excellent'];
 
-const adapter = transform((data, cb) => {
+const adapter = () => transform((data, cb) => {
   data.hours = data.hours.map((value, idx) => {
     return parseHumanTimeRange(value);
   });
@@ -40,18 +40,18 @@ const adapter = transform((data, cb) => {
   });
 });
 
-const jsonify = transform((data, cb) => {
+const jsonify = () => transform((data, cb) => {
   try { cb(null, JSON.stringify(data)); }
   catch (err) { cb(err); }
 });
 
-const collect = collector({
+const collect = () => collector({
   delimiter: ',',
   prefix: '[',
   suffix: ']'
 });
 
-const toStringStream = transform((data, cb) => {
+const toStringStream = () => transform((data, cb) => {
   try { cb(null, data.toString()); }
   catch (err) { cb(err); }
 });
@@ -63,19 +63,19 @@ function getRating(rating){
 function csvStreamToAdaptedJsonStream(csvStream/*: NodeJS.ReadStream | ReadStream */)/*: NodeJS.ReadStream | ReadStream */ {
   return csvStream
     .pipe(csv.parse({ trim: true }))
-    .pipe(translateHeadings)
+    .pipe(mkTranslateHeadings(config))
     //.pipe(logger({ prefix: 'translated', n: 2 }))
     .pipe(csv.stringify())
     //.pipe(logger({ prefix: 'stringified', n: 2 }))
     .pipe(csv.parse({ columns: true }))
     //.pipe(logger({ prefix: 'parsed', n: 2 }))
     //.pipe(skip(1)) // ignore unnecessary { column: 'column', ... } object
-    .pipe(expand) // expand 'foo[bar]' and 'arr[0]' keys in each object
-    .pipe(adapter) // adapt values to mongo compatible
+    .pipe(expand()) // expand 'foo[bar]' and 'arr[0]' keys in each object
+    .pipe(adapter()) // adapt values to mongo compatible
     // .pipe(logger({ prefix: 'adapted', n: 2 }))
-    .pipe(jsonify) // get a JSON string for each row
-    .pipe(collect) // collect each element to an JSON Array string, as a buffer.
-    .pipe(toStringStream) // turn buffer to a string
+    .pipe(jsonify()) // get a JSON string for each row
+    .pipe(collect()) // collect each element to an JSON Array string, as a buffer.
+    .pipe(toStringStream()) // turn buffer to a string
   ;
 };
 Object.assign(module.exports, { csvStreamToAdaptedJsonStream });
