@@ -16,6 +16,7 @@ const config = require('./config.example.js');
 const transformColumnHeadings = require('./pre-transformer.js')(config);
 
 const skip = require('./skip');
+const expand = require('./expand');
 
 const args = parseArgs();
 const input = getInputStream(args);
@@ -42,6 +43,7 @@ input
 .pipe(csv.stringify()) // stringify each row
 .pipe(csv.parse({ columns: values(config.columns) }))
 .pipe(skip(1)) // ignore column headings row; we have objects now.
+.pipe(expand) // expand 'foo[bar]' and 'arr[0]' keys in each object
 .pipe(jsonify) // get a JSON string for each row
 .pipe(collect) // collect each element to an JSON Array string, as a buffer.
 .pipe(toStringStream) // turn buffer to a string
