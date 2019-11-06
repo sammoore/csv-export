@@ -9,6 +9,7 @@ function values(object) {
 const csv = require('csv');
 const fs = require('fs');
 const parseArgs = require('./parse-args');
+const parseHumanTimeRange = require('./parseHumanTimeRange');
 const transform = require('stream-transform');
 const Collector = require('./collect');
 const logger = require('./logger');
@@ -20,6 +21,22 @@ const expand = require('./expand');
 
 const args = parseArgs();
 const input = getInputStream(args);
+
+const adapter = transform((data, cb) => {
+  data.hours = data.hours.map(parseHumanTimeRange);
+  
+  for (var key in data.perks) {
+    var value = data.perks[key];
+
+    if (value.toLowerCase().indexOf('yes') != -1) {
+      data.perks[key] = true;
+    } else {
+      data.perks[key] = false;
+    }
+  }
+
+  cb(null, data);
+});
 
 const jsonify = transform((data, cb) => {
   try { cb(null, JSON.stringify(data)); }
@@ -44,6 +61,7 @@ input
 .pipe(csv.parse({ columns: values(config.columns) }))
 .pipe(skip(1)) // ignore column headings row; we have objects now.
 .pipe(expand) // expand 'foo[bar]' and 'arr[0]' keys in each object
+.pipe(adapter) // adapt values to mongo compatible
 .pipe(jsonify) // get a JSON string for each row
 .pipe(collect) // collect each element to an JSON Array string, as a buffer.
 .pipe(toStringStream) // turn buffer to a string
