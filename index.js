@@ -11,6 +11,7 @@ const config = require('./config.example.js');
 const mkTranslateHeadings = require('./pre-transformer.js');
 const parseHumanTimeRange = require('./parseHumanTimeRange');
 const parseGeoCode = require('./parseGeoCode');
+
 const ratings = ['Better than nothing', 'Good', 'Excellent'];
 
 const adapter = () => transform((data, cb) => {
@@ -33,7 +34,7 @@ const adapter = () => transform((data, cb) => {
   if (data.access.toLowerCase().indexOf('token') != -1){
     data.access = 'Key'
   }
-  data.rating = getRating(data.rating);
+  data.rating = ratings.indexOf(data.rating);
   parseGeoCode(data.address).then(response => {
     data.coordinates = response;
     cb(null, data);
@@ -55,10 +56,6 @@ const toStringStream = () => transform((data, cb) => {
   try { cb(null, data.toString()); }
   catch (err) { cb(err); }
 });
-
-function getRating(rating){
-  return ratings.indexOf(rating);
-}
 
 function csvStreamToAdaptedJsonStream(csvStream/*: NodeJS.ReadStream | ReadStream */)/*: NodeJS.ReadStream | ReadStream */ {
   return csvStream
